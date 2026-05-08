@@ -10,7 +10,7 @@
             <!-- Blog Header -->
             <div class="mb-4">
                 @if($blog->image)
-                    <img src="{{ asset($blog->image) }}" class="img-fluid rounded" alt="{{ $blog->title }}" style="max-height: 500px; object-fit: cover; width: 100%;">
+                    <img src="{{ secure_asset($blog->image) }}" class="img-fluid rounded" alt="{{ $blog->title }}" style="max-height: 500px; object-fit: cover; width: 100%;">
                 @else
                     <div class="bg-secondary rounded d-flex align-items-center justify-content-center" style="height: 400px;">
                         <i class="fas fa-image text-white" style="font-size: 5rem; opacity: 0.5;"></i>
