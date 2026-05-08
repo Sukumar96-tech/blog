@@ -4,6 +4,9 @@
 
 $(document).ready(function () {
 
+    // IMPORTANT
+    const BASE_URL = "https://blog-management-system-u4yu.onrender.com";
+
     initializeTooltips();
 
     /**
@@ -19,7 +22,7 @@ $(document).ready(function () {
         // Category Filter
         if (filterType === 'category' && filterValue) {
 
-            url = '/filter-category';
+            url = BASE_URL + '/filter-category';
 
             ajaxData = {
                 category: filterValue
@@ -29,7 +32,7 @@ $(document).ready(function () {
         // Date Filter
         else if (filterType === 'date' && filterValue) {
 
-            url = '/filter-date';
+            url = BASE_URL + '/filter-date';
 
             ajaxData = {
                 start_date: filterValue,
@@ -40,7 +43,7 @@ $(document).ready(function () {
         // Search Filter
         else if (filterType === 'search' && filterValue) {
 
-            url = '/search';
+            url = BASE_URL + '/search';
 
             ajaxData = {
                 q: filterValue
