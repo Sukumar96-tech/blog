@@ -53,5 +53,11 @@ RUN php artisan storage:link || true
 # Expose Apache port
 EXPOSE 80
 
+
+RUN php artisan config:clear
+RUN php artisan cache:clear
+RUN php artisan route:clear
+RUN php artisan view:clear
+
 # Start Laravel app
 CMD php artisan migrate --force && php artisan db:seed --force && apache2-foreground
