@@ -38,7 +38,7 @@
                 <select id="categoryFilter" class="form-select">
 
                     <option value="">
-                        All Categories
+                        None
                     </option>
 
                     @foreach($categories as $category)
