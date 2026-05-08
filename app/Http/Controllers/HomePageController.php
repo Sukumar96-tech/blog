@@ -13,8 +13,12 @@ class HomePageController extends Controller
     public function index()
     {
         $blogs = Blog::orderBy('created_at', 'desc')->paginate(9);
-        $categories = Blog::distinct()->pluck('category')->filter();
-        
+
+        $categories = Blog::select('category')
+            ->distinct()
+            ->pluck('category')
+            ->filter();
+
         return view('home', compact('blogs', 'categories'));
     }
 
@@ -24,8 +28,10 @@ class HomePageController extends Controller
     public function show($id)
     {
         $blog = Blog::findOrFail($id);
+
         $relatedBlogs = Blog::where('category', $blog->category)
             ->where('id', '!=', $id)
+            ->latest()
             ->limit(3)
             ->get();
 
@@ -37,17 +43,31 @@ class HomePageController extends Controller
      */
     public function filterByCategory(Request $request)
     {
-        $category = $request->input('category');
-        
-        if (empty($category) || $category === 'all') {
-            $blogs = Blog::orderBy('created_at', 'desc')->get();
-        } else {
-            $blogs = Blog::where('category', $category)
-                ->orderBy('created_at', 'desc')
-                ->get();
-        }
+        try {
 
-        return view('partials.blog_cards', compact('blogs'));
+            $category = $request->input('category');
+
+            if (empty($category) || $category === 'all') {
+
+                $blogs = Blog::latest()->get();
+
+            } else {
+
+                $blogs = Blog::where('category', $category)
+                    ->latest()
+                    ->get();
+            }
+
+            return response()->json([
+                'html' => view('partials.blog_cards', compact('blogs'))->render()
+            ]);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -55,15 +75,27 @@ class HomePageController extends Controller
      */
     public function filterByDate(Request $request)
     {
-        $startDate = $request->input('start_date');
-        $endDate = $request->input('end_date');
+        try {
 
-        $blogs = Blog::whereBetween('created_at', [
-            $startDate . ' 00:00:00',
-            $endDate . ' 23:59:59'
-        ])->orderBy('created_at', 'desc')->get();
+            $startDate = $request->input('start_date');
 
-        return view('partials.blog_cards', compact('blogs'));
+            $endDate = $request->input('end_date');
+
+            $blogs = Blog::whereBetween('created_at', [
+                $startDate . ' 00:00:00',
+                $endDate . ' 23:59:59'
+            ])->latest()->get();
+
+            return response()->json([
+                'html' => view('partials.blog_cards', compact('blogs'))->render()
+            ]);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -71,14 +103,25 @@ class HomePageController extends Controller
      */
     public function search(Request $request)
     {
-        $query = $request->input('q');
+        try {
 
-        $blogs = Blog::where('title', 'like', "%$query%")
-            ->orWhere('short_description', 'like', "%$query%")
-            ->orWhere('content', 'like', "%$query%")
-            ->orderBy('created_at', 'desc')
-            ->get();
+            $query = $request->input('q');
 
-        return view('partials.blog_cards', compact('blogs'));
+            $blogs = Blog::where('title', 'like', "%{$query}%")
+                ->orWhere('short_description', 'like', "%{$query}%")
+                ->orWhere('content', 'like', "%{$query}%")
+                ->latest()
+                ->get();
+
+            return response()->json([
+                'html' => view('partials.blog_cards', compact('blogs'))->render()
+            ]);
+
+        } catch (\Exception $e) {
+
+            return response()->json([
+                'error' => $e->getMessage()
+            ], 500);
+        }
     }
 }
