@@ -1,56 +1,57 @@
-# Use official PHP image
-FROM php:8.1-fpm
-
-# Set working directory
-WORKDIR /app
+FROM php:8.2-apache
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
-    curl \
-    libmcrypt-dev \
-    mysql-client \
-    libmagickwand-dev \
-    libpq-dev \
-    libzip-dev \
-    zip \
     unzip \
-    && rm -rf /var/lib/apt/lists/*
+    libzip-dev \
+    zip
 
 # Install PHP extensions
-RUN docker-php-ext-install \
-    pdo \
-    pdo_mysql \
-    zip \
-    && docker-php-ext-enable pdo pdo_mysql zip
+RUN docker-php-ext-install pdo pdo_mysql zip
+
+# Enable Apache rewrite module
+RUN a2enmod rewrite
 
 # Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy composer files
-COPY composer.json composer.lock ./
+# Set working directory
+WORKDIR /var/www/html
 
-# Install PHP dependencies
-RUN composer install --no-interaction --optimize-autoloader --no-dev
-
-# Copy application files
+# Copy project files
 COPY . .
 
-# Copy environment file
-RUN cp .env.example .env || true
+# Install Laravel dependencies
+RUN composer install --no-dev --optimize-autoloader
 
-# Generate application key
-RUN php artisan key:generate --force || true
+# Configure Apache public folder
+ENV APACHE_DOCUMENT_ROOT /var/www/html/public
 
-# Create storage directories
-RUN mkdir -p storage/framework/{sessions,views,cache} storage/logs public/storage && \
-    chmod -R 775 storage bootstrap/cache
+RUN sed -ri -e 's!/var/www/html!${APACHE_DOCUMENT_ROOT}!g' \
+    /etc/apache2/sites-available/*.conf
 
-# Create symbolic link for storage
+RUN sed -ri -e 's!/var/www/!${APACHE_DOCUMENT_ROOT}!g' \
+    /etc/apache2/apache2.conf /etc/apache2/conf-available/*.conf
+
+# Clear Laravel caches
+RUN php artisan optimize:clear
+
+# Create required Laravel folders
+RUN mkdir -p \
+    storage/framework/sessions \
+    storage/framework/cache \
+    storage/framework/views \
+    bootstrap/cache
+
+# Set permissions
+RUN chmod -R 777 storage bootstrap/cache
+
+# Create storage link
 RUN php artisan storage:link || true
 
-# Expose port
-EXPOSE 8000
+# Expose Apache port
+EXPOSE 80
 
-# Start PHP-FPM
-CMD ["php-fpm"]
+# Start Laravel app
+CMD php artisan migrate --force && php artisan db:seed --force && apache2-foreground
