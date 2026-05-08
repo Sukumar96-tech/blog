@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+  # PHP-FPM Service
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: bloghub_app
+    restart: unless-stopped
+    working_dir: /app
+    environment:
+      - APP_ENV=local
+      - APP_DEBUG=true
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=bloghub
+      - DB_USERNAME=bloghub_user
+      - DB_PASSWORD=bloghub_password
+    volumes:
+      - ./:/app
+    depends_on:
+      - db
+    networks:
+      - bloghub_network
+
+  # Nginx Service
+  nginx:
+    image: nginx:alpine
+    container_name: bloghub_nginx
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./:/app
+      - ./docker/nginx/conf.d:/etc/nginx/conf.d
+    depends_on:
+      - app
+    networks:
+      - bloghub_network
+
+  # MySQL Service
+  db:
+    image: mysql:8.0
+    container_name: bloghub_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: bloghub
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_PASSWORD: bloghub_password
+      MYSQL_USER: bloghub_user
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    networks:
+      - bloghub_network
+
+  # Redis Service (optional)
+  redis:
+    image: redis:7-alpine
+    container_name: bloghub_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - bloghub_network
+
+volumes:
+  db_data:
+
+networks:
+  bloghub_network:
+    driver: bridge
