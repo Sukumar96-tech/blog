@@ -288,14 +288,14 @@
         </div>
     </footer>
 
-    <!-- jQuery -->
+        <!-- jQuery -->
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
     <!-- Bootstrap -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- AJAX JS -->
-    <script src="{{ asset('js/blog-ajax.js') }}"></script>
+    <script src="/js/blog-ajax.js"></script>
 
     @yield('custom-js')
 
