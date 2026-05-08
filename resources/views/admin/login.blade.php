@@ -178,7 +178,7 @@
                 @endif
 
                 <!-- Login Form -->
-                <form method="POST" action="{{ route('admin.login.post') }}">
+                <form method="POST" action="https://blog-management-system-u4yu.onrender.com/admin/login">
                     @csrf
 
                     <div class="form-group">
