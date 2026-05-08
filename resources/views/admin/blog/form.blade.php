@@ -93,7 +93,7 @@
             <div class="card-body">
                 @if(isset($blog) && $blog->image)
                     <div class="mb-3 text-center">
-                        <img src="{{ asset($blog->image) }}" class="img-fluid rounded" style="max-height: 200px;">
+                        <img src="{{ secure_asset($blog->image) }}" class="img-fluid rounded" style="max-height: 200px;">
                         <small class="d-block text-muted mt-2">Current Image</small>
                     </div>
                 @endif
