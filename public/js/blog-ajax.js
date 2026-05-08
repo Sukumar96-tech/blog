@@ -24,7 +24,6 @@ $(document).ready(function () {
             ajaxData = {
                 category: filterValue
             };
-
         }
 
         // Date Filter
@@ -36,7 +35,6 @@ $(document).ready(function () {
                 start_date: filterValue,
                 end_date: filterValue
             };
-
         }
 
         // Search Filter
@@ -47,7 +45,6 @@ $(document).ready(function () {
             ajaxData = {
                 q: filterValue
             };
-
         }
 
         // Reset
@@ -69,6 +66,8 @@ $(document).ready(function () {
 
             success: function (response) {
 
+                console.log("SUCCESS RESPONSE:", response);
+
                 // JSON response
                 if (response.html) {
 
@@ -77,22 +76,24 @@ $(document).ready(function () {
                 } else {
 
                     $('#blogContainer').html(response);
-
                 }
 
                 $('#paginationContainer').html('');
 
                 hideLoadingState();
-
             },
 
-            error: function (xhr) {
+            error: function (xhr, status, error) {
 
-                console.log(xhr.responseText);
+                console.log("STATUS:", status);
+
+                console.log("ERROR:", error);
+
+                console.log("FULL RESPONSE:", xhr.responseText);
 
                 hideLoadingState();
 
-                alert('An error occurred while filtering blogs.');
+                alert("Check browser console for actual Laravel error.");
             }
         });
     }
