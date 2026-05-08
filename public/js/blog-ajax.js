@@ -4,8 +4,8 @@
 
 $(document).ready(function () {
 
-    // IMPORTANT
-    const BASE_URL = "https://blog-management-system-u4yu.onrender.com";
+    // IMPORTANT: use current origin to avoid mixed-content (http/https) issues
+    const BASE_URL = window.location.origin;
 
     initializeTooltips();
 

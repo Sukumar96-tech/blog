@@ -295,8 +295,7 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- AJAX JS -->
-    <script src="/js/blog-ajax.js"></script>
-
+    <script src="/js/blog-ajax.js?v=2"></script>
     @yield('custom-js')
 
 </body>
